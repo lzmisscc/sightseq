@@ -25,7 +25,11 @@ from fairseq.meters import AverageMeter, StopwatchMeter
 
 def main(args, init_distributed=False):
     utils.import_user_module(args)
-    args.max_tokens = 30
+    # args.max_tokens = 30
+    # args.decoder_layerdrop=0.
+    # args.no_scale_embedding = True
+    # args.adaptive_input = True
+    # args.max_sentences = 10
     assert args.max_tokens is not None or args.max_sentences is not None, \
         'Must specify batch size either with --max-tokens or --max-sentences'
 
