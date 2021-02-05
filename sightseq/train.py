@@ -25,11 +25,13 @@ from fairseq.meters import AverageMeter, StopwatchMeter
 
 def main(args, init_distributed=False):
     utils.import_user_module(args)
+
     # args.max_tokens = 30
     # args.decoder_layerdrop=0.
     # args.no_scale_embedding = True
     # args.adaptive_input = True
     # args.max_sentences = 10
+
     assert args.max_tokens is not None or args.max_sentences is not None, \
         'Must specify batch size either with --max-tokens or --max-sentences'
 
@@ -105,6 +107,13 @@ def main(args, init_distributed=False):
 
 def train(args, trainer, task, epoch_itr):
     """Train the model for one epoch."""
+
+    import wandb
+    wandb.init(
+        project='sight-seq',
+        config=args,
+    )
+
     # Update parameters every N batches
     update_freq = args.update_freq[epoch_itr.epoch - 1] \
         if epoch_itr.epoch <= len(args.update_freq) else args.update_freq[-1]
