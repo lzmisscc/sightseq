@@ -22,6 +22,8 @@ from fairseq.data import iterators
 from fairseq.trainer import Trainer
 from fairseq.meters import AverageMeter, StopwatchMeter
 
+import ipdb
+
 
 def main(args, init_distributed=False):
     utils.import_user_module(args)
@@ -56,7 +58,8 @@ def main(args, init_distributed=False):
     model = task.build_model(args)
     criterion = task.build_criterion(args)
     # print(model)
-    print('| model {}, criterion {}'.format(args.arch, criterion.__class__.__name__))
+    print('| model {}, criterion {}'.format(
+        args.arch, criterion.__class__.__name__))
     print('| num. model params: {} (num. trained: {})'.format(
         sum(p.numel() for p in model.parameters()),
         sum(p.numel() for p in model.parameters() if p.requires_grad),
@@ -87,7 +90,8 @@ def main(args, init_distributed=False):
         train(args, trainer, task, epoch_itr)
 
         if not args.disable_validation and epoch_itr.epoch % args.validate_interval == 0:
-            valid_losses = validate(args, trainer, task, epoch_itr, valid_subsets)
+            valid_losses = validate(
+                args, trainer, task, epoch_itr, valid_subsets)
         else:
             valid_losses = [None]
 
@@ -96,7 +100,8 @@ def main(args, init_distributed=False):
 
         # save checkpoint
         if epoch_itr.epoch % args.save_interval == 0:
-            checkpoint_utils.save_checkpoint(args, trainer, epoch_itr, valid_losses[0])
+            checkpoint_utils.save_checkpoint(
+                args, trainer, epoch_itr, valid_losses[0])
 
         if ':' in getattr(args, 'data', ''):
             # sharded data: get train iterator for next epoch
@@ -148,6 +153,7 @@ def train(args, trainer, task, epoch_itr):
             stats[k] = extra_meters[k].avg
         progress.log(stats, tag='train', step=stats['num_updates'])
 
+        # wandb.log(stats)
         # ignore the first mini-batch in words-per-second calculation
         if i == 0:
             trainer.get_meter('wps').reset()
@@ -159,8 +165,10 @@ def train(args, trainer, task, epoch_itr):
             and num_updates % args.save_interval_updates == 0
             and num_updates > 0
         ):
-            valid_losses = validate(args, trainer, task, epoch_itr, valid_subsets)
-            checkpoint_utils.save_checkpoint(args, trainer, epoch_itr, valid_losses[0])
+            valid_losses = validate(
+                args, trainer, task, epoch_itr, valid_subsets)
+            checkpoint_utils.save_checkpoint(
+                args, trainer, epoch_itr, valid_losses[0])
 
         if num_updates >= max_update:
             break
@@ -302,7 +310,8 @@ def cli_main():
         # fallback for single node with multiple GPUs
         assert args.distributed_world_size <= torch.cuda.device_count()
         port = random.randint(10000, 20000)
-        args.distributed_init_method = 'tcp://localhost:{port}'.format(port=port)
+        args.distributed_init_method = 'tcp://localhost:{port}'.format(
+            port=port)
         args.distributed_rank = None  # set based on device id
         if max(args.update_freq) > 1 and args.ddp_backend != 'no_c10d':
             print('| NOTE: you may get better performance with: --ddp-backend=no_c10d')
