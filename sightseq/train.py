@@ -23,7 +23,7 @@ from fairseq.trainer import Trainer
 from fairseq.meters import AverageMeter, StopwatchMeter
 
 import ipdb
-
+import wandb
 
 def main(args, init_distributed=False):
     utils.import_user_module(args)
@@ -46,6 +46,10 @@ def main(args, init_distributed=False):
 
     # Print args
     print(args)
+    wandb.init(
+        project='sight-seq',
+        config=args,
+    )
 
     # Setup task, e.g., translation, language modeling, etc.
     task = tasks.setup_task(args)
@@ -112,12 +116,6 @@ def main(args, init_distributed=False):
 
 def train(args, trainer, task, epoch_itr):
     """Train the model for one epoch."""
-
-    import wandb
-    wandb.init(
-        project='sight-seq',
-        config=args,
-    )
 
     # Update parameters every N batches
     update_freq = args.update_freq[epoch_itr.epoch - 1] \
