@@ -62,3 +62,8 @@ LOCK
 LOG*
 CURRENT
 MANIFEST-*
+
+# Custom
+wandb/
+.vscode/
+*.txt*
