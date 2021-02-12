@@ -21,7 +21,7 @@ def split_fileanme_content(line):
 # res = split_fileanme_content("das.jpg\t<<b><<=>daa sada</b>")
 # exit(res)
 
-# 训练集
+# 验证集
 with open('data/val.txt', 'r') as f:
     lines = f.readlines()
 
@@ -35,5 +35,16 @@ for l in lines:
     
 with open("valid.txt", "w") as f:
     f.writelines(new_lines)
+
+# 训练集
+with open('data/train.txt', 'r') as f:
+    lines = f.readlines()
+
+names, tokens = [], []
+lines = tqdm.tqdm(lines)
+new_lines = []
+for l in lines:
+    name, token = split_fileanme_content(l)
+    new_lines.append(f"data/train/{name} {token}\n")
 with open("train.txt", "w") as f:
     f.writelines(new_lines)
